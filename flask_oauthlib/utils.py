@@ -1,6 +1,6 @@
 # coding: utf-8
 
-import base64
+import base64, urlparse
 from flask import request, Response
 from oauthlib.common import to_unicode, bytes_type
 
@@ -29,6 +29,9 @@ def extract_params():
         del headers['wsgi.errors']
 
     body = request.form.to_dict()
+    data = urlparse.parse_qs(request.data)
+    for key in data:
+        body[key] = data[key][0]
     return uri, http_method, body, headers
 
 

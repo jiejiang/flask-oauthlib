@@ -11,6 +11,7 @@
 import os
 import logging
 import datetime
+import urlparse
 from functools import wraps
 from flask import request, url_for
 from flask import redirect, abort
@@ -423,14 +424,15 @@ class OAuth2Provider(object):
 
     def confirm_authorization_request(self):
         """When consumer confirm the authorization."""
+        data = urlparse.parse_qs(request.data)
         server = self.server
-        scope = request.values.get('scope') or ''
+        scope = request.values.get('scope') or data.get('scope')[0] if data.get('scope') and len(data.get('scope')) > 0 else ''
         scopes = scope.split()
         credentials = dict(
-            client_id=request.values.get('client_id'),
-            redirect_uri=request.values.get('redirect_uri', None),
-            response_type=request.values.get('response_type', None),
-            state=request.values.get('state', None)
+            client_id=request.values.get('client_id') or data.get('client_id')[0] if data.get('client_id') and len(data.get('client_id')) > 0 else None,
+            redirect_uri=request.values.get('redirect_uri') or data.get('redirect_uri')[0] if data.get('redirect_uri') and len(data.get('redirect_uri')) > 0 else None,
+            response_type=request.values.get('response_type') or data.get('response_type')[0] if data.get('response_type') and len(data.get('response_type')) > 0 else None,
+            state=request.values.get('state') or data.get('state')[0] if data.get('state') and len(data.get('state')) > 0 else None
         )
         log.debug('Fetched credentials from request %r.', credentials)
         redirect_uri = credentials.get('redirect_uri')
