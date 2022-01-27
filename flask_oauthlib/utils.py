@@ -32,6 +32,8 @@ def extract_params():
     data = urlparse.parse_qs(request.data)
     for key in data:
         body[key] = data[key][0]
+    if request.json:
+        body.update(request.json)
     return uri, http_method, body, headers
 
 
