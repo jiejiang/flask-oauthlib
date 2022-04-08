@@ -34,6 +34,8 @@ def extract_params():
         body[key] = data[key][0]
     if request.json:
         body.update(request.json)
+    if 'Authorization' in headers and headers['Authorization'].startswith('Basic '): #remove basic auth because BSH proxy will have issue with it
+        del headers['Authorization']
     return uri, http_method, body, headers
 
 
